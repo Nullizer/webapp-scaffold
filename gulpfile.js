@@ -3,36 +3,38 @@ const htmlmin      = require('gulp-htmlmin')
 const postcss      = require('gulp-postcss')
 const rollup       = require('gulp-rollup')
 const sourcemaps   = require('gulp-sourcemaps')
-const clean        = require('gulp-clean')
+const del          = require('del')
 const autoprefixer = require('autoprefixer')
 const cssnext      = require('postcss-cssnext')
 const cssnano      = require('cssnano')
 const uglify       = require('rollup-plugin-uglify')
 const babel        = require('rollup-plugin-babel')
+const npm          = require('rollup-plugin-npm')
+const commonjs     = require('rollup-plugin-commonjs')
 
 const destDir = './dest'
 
 gulp.task('default', ['html-minify', 'postcss', 'bundle'])
 
 gulp.task('clean', () => {
-	gulp.src(destDir, {read: false})
-		.pipe(clean({force: true}))
+  del([destDir])
 })
 
-gulp.task('clean-bundle', () => {
-  gulp.src(destDir + '/**/*.js?(.map)', {read: false})
-    .pipe(clean({force: true}))
+gulp.task('clean:bundle', () => {
+  del([destDir + '/**/*.js?(.map)'])
 })
 
-gulp.task('bundle', ['clean-bundle'], () => {
+gulp.task('bundle', ['clean:bundle'], () => {
   gulp.src('src/**/*.js', {read: false})
     .pipe(rollup({
       format: 'umd',
       plugins: [
-		    babel({
-		      exclude: 'node_modules/**',
-		      presets: ["es2015-rollup"]
-		    }),
+        npm({ jsnext: true, main: true }),
+        commonjs(),
+        babel({
+          exclude: 'node_modules/**',
+          presets: ["es2015-rollup"]
+        }),
         uglify() // depend babel if code is es2015 syntax
       ],
       sourceMap: true
