@@ -1,0 +1,19 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+  font-family: "Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",sans-serif;
+}
+.flex-test {
+  display: flex;
+}
+:root {
+  --mainColor: red;
+}
+
+.red-test {
+  color: var(--mainColor);
+}
