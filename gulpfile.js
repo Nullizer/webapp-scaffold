@@ -9,6 +9,8 @@ const cssnext      = require('postcss-cssnext')
 const cssnano      = require('cssnano')
 const uglify       = require('rollup-plugin-uglify')
 const babel        = require('rollup-plugin-babel')
+const npm          = require('rollup-plugin-npm')
+const commonjs     = require('rollup-plugin-commonjs')
 
 const destDir = './dest'
 
@@ -29,6 +31,8 @@ gulp.task('bundle', ['clean-bundle'], () => {
     .pipe(rollup({
       format: 'umd',
       plugins: [
+				npm({ jsnext: true, main: true }),
+    		commonjs(),
 		    babel({
 		      exclude: 'node_modules/**',
 		      presets: ["es2015-rollup"]
