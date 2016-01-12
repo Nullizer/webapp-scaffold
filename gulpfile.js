@@ -1,13 +1,14 @@
-const gulp = require('gulp')
-const htmlmin = require('gulp-htmlmin')
-const postcss = require('gulp-postcss')
-const rollup = require('gulp-rollup')
-const sourcemaps = require('gulp-sourcemaps')
-const cssnext = require('postcss-cssnext')
+const gulp         = require('gulp')
+const htmlmin      = require('gulp-htmlmin')
+const postcss      = require('gulp-postcss')
+const rollup       = require('gulp-rollup')
+const sourcemaps   = require('gulp-sourcemaps')
+const clean        = require('gulp-clean')
 const autoprefixer = require('autoprefixer')
-const cssnano = require('cssnano')
-const clean = require('gulp-clean')
-const uglify = require('rollup-plugin-uglify')
+const cssnext      = require('postcss-cssnext')
+const cssnano      = require('cssnano')
+const uglify       = require('rollup-plugin-uglify')
+const babel        = require('rollup-plugin-babel')
 
 const destDir = './dest'
 
@@ -28,11 +29,15 @@ gulp.task('bundle', ['clean-bundle'], () => {
     .pipe(rollup({
       format: 'umd',
       plugins: [
-        uglify()
+		    babel({
+		      exclude: 'node_modules/**',
+		      presets: ["es2015-rollup"]
+		    }),
+        uglify() // depend babel if code is es2015 syntax
       ],
-        sourceMap: true
+      sourceMap: true
     }))
-    .pipe(sourcemaps.write('.')) // this only works if the sourceMap option is true
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destDir))
 })
 
