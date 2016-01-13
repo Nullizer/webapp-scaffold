@@ -48,8 +48,7 @@ gulp.task('bundle', ['clean:bundle'], () => {
 gulp.task('postcss', () => {
   const processors = [
     cssnext({
-      browsers: ['last 3 versions', 'ie >= 9', 'Edge >= 12', 'Firefox ESR',
-                 'Chrome >= 16', 'Opera >= 11', 'Android >= 2.3', 'iOS >= 7']
+      browsers: ['> 0%']
     }),
     cssnano(),
   ]
@@ -68,7 +67,7 @@ gulp.task('postcss:oldie', () => {
         browsers: ['last 1 versions']
       }),
       oldie({
-        rgba: { filter: true },
+        rgba: { filter : true },
         rem : { replace: true },
         unmq: { disable: false },
       }),
