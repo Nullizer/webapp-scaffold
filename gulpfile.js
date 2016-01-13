@@ -16,7 +16,7 @@ const commonjs     = require('rollup-plugin-commonjs')
 
 const destDir = './dest'
 
-gulp.task('default', ['html-minify', 'postcss', 'postcss:oldie', 'bundle'])
+gulp.task('default', ['html:minify', 'postcss', 'postcss:oldie', 'bundle'])
 
 gulp.task('clean', () => {
   del([destDir])
@@ -77,7 +77,7 @@ gulp.task('postcss:oldie', () => {
     .pipe(gulp.dest(destDir))
 })
 
-gulp.task('html-minify', () => {
+gulp.task('html:minify', () => {
   gulp.src('./src/**/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest(destDir))
