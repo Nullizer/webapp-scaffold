@@ -35,14 +35,14 @@ gulp.task('bundle', ['clean:bundle'], () => {
         commonjs(),
         babel({
           exclude: 'node_modules/**',
-          plugins: ["transform-async-to-generator"],
+          plugins: ['transform-async-to-generator'],
         }),
       ],
       sourceMap: true
     }))
     .pipe(prettydiff({
-      lang: "javascript",
-      mode: "minify",
+      lang: 'javascript',
+      mode: 'minify',
     }))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destDir))
