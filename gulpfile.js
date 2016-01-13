@@ -35,7 +35,7 @@ gulp.task('bundle', ['clean:bundle'], () => {
         commonjs(),
         babel({
           exclude: 'node_modules/**',
-          presets: ["es2015-rollup"]
+          presets: ["es2015-rollup"],
         }),
         uglify() // depend babel if code is es2015 syntax
       ],
@@ -46,15 +46,12 @@ gulp.task('bundle', ['clean:bundle'], () => {
 })
 
 gulp.task('postcss', () => {
-  const processors = [
-    cssnext({
-      browsers: ['> 0%']
-    }),
-    cssnano(),
-  ]
-  return gulp.src('./src/**/*.css')
+  gulp.src('./src/**/*.css')
     .pipe(sourcemaps.init())
-    .pipe(postcss(processors))
+    .pipe(postcss([
+      cssnext({ browsers: ['> 0%'] }),
+      cssnano(),
+    ]))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destDir))
 })
@@ -63,17 +60,13 @@ gulp.task('postcss:oldie', () => {
   gulp.src('./src/**/*.css')
     .pipe(sourcemaps.init())
     .pipe(postcss([
-      cssnext({
-        browsers: ['last 1 versions']
-      }),
+      cssnext({ browsers: ['last 1 versions'] }),
       oldie({
         rgba: { filter : true },
         rem : { replace: true },
         unmq: { disable: false },
       }),
-      autoprefixer({
-        browsers: ['ie >= 6']
-      }),
+      autoprefixer({ browsers: ['ie >= 6'] }),
       cssnano(),
     ]))
     .pipe(rename(path => path.extname = '.oldie.css'))
