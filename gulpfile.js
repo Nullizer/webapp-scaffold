@@ -6,6 +6,7 @@ const sourcemaps   = require('gulp-sourcemaps')
 const rename       = require("gulp-rename")
 const del          = require('del')
 const cssnext      = require('postcss-cssnext')
+const autoprefixer = require('autoprefixer')
 const cssnano      = require('cssnano')
 const oldie        = require('oldie')
 const uglify       = require('rollup-plugin-uglify')
@@ -70,6 +71,9 @@ gulp.task('postcss:oldie', () => {
         rgba: { filter: true },
         rem : { replace: true },
         unmq: { disable: false },
+      }),
+      autoprefixer({
+        browsers: ['ie >= 6']
       }),
       cssnano(),
     ]))
