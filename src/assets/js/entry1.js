@@ -12,3 +12,8 @@ function test() {
 }
 
 test()
+
+;(async function () {
+  const data = await fetch('/subfolder/a.html').then(r => r.text())
+  console.log(`Got async data: ${data}`)
+})()

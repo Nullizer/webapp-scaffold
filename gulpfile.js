@@ -4,12 +4,12 @@ const postcss      = require('gulp-postcss')
 const rollup       = require('gulp-rollup')
 const sourcemaps   = require('gulp-sourcemaps')
 const rename       = require("gulp-rename")
+const prettydiff   = require("gulp-prettydiff")
 const del          = require('del')
 const cssnext      = require('postcss-cssnext')
 const autoprefixer = require('autoprefixer')
 const cssnano      = require('cssnano')
 const oldie        = require('oldie')
-const uglify       = require('rollup-plugin-uglify')
 const babel        = require('rollup-plugin-babel')
 const npm          = require('rollup-plugin-npm')
 const commonjs     = require('rollup-plugin-commonjs')
@@ -35,11 +35,14 @@ gulp.task('bundle', ['clean:bundle'], () => {
         commonjs(),
         babel({
           exclude: 'node_modules/**',
-          presets: ["es2015-rollup"],
+          plugins: ["transform-async-to-generator"],
         }),
-        uglify() // depend babel if code is es2015 syntax
       ],
       sourceMap: true
+    }))
+    .pipe(prettydiff({
+      lang: "javascript",
+      mode: "minify",
     }))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(destDir))
