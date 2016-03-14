@@ -18,7 +18,19 @@ const path         = require('path')
 
 const destDir = './www'
 
-gulp.task('default', ['html:minify', 'postcss', 'postcss:oldie', 'copy:dist', 'bundle', 'copy:dist'])
+gulp.task('default', ['html:minify', 'postcss', 'postcss:oldie', 'bundle', 'copy:dist', 'copy:assets'])
+
+const htmlSrc  = './src/**/*.html'
+const cssSrc   = './src/**/*.css'
+const jsSrc    = './src/**/*.js'
+const assetSrc = './src/**/*.+(jpg|png|gif)'
+
+gulp.task('watch', () => {
+  gulp.watch(htmlSrc, ['html:minify'])
+  gulp.watch(cssSrc, ['postcss', 'postcss:oldie'])
+  gulp.watch(jsSrc, ['bundle'])
+  gulp.watch(assetSrc, ['copy:assets'])
+})
 
 gulp.task('clean', () => {
   del([destDir])
@@ -29,7 +41,7 @@ gulp.task('clean:js', () => {
 })
 
 gulp.task('copy:assets', () => {
-  gulp.src('./src/**/*.+(jpg|png|gif)')
+  gulp.src(assetSrc)
     .pipe(gulp.dest(destDir))
 })
 
@@ -63,7 +75,7 @@ gulp.task('bundle', () => {
 })
 
 gulp.task('postcss', () => {
-  gulp.src('./src/**/*.css')
+  gulp.src(cssSrc)
     .pipe(sourcemaps.init())
     .pipe(postcss([
       cssnext({ browsers: ['> 0%'] }),
@@ -74,7 +86,7 @@ gulp.task('postcss', () => {
 })
 
 gulp.task('postcss:oldie', () => {
-  gulp.src('./src/**/*.css')
+  gulp.src(cssSrc)
     .pipe(sourcemaps.init())
     .pipe(postcss([
       cssnext({ browsers: ['last 1 versions'] }),
@@ -92,7 +104,7 @@ gulp.task('postcss:oldie', () => {
 })
 
 gulp.task('html:minify', () => {
-  gulp.src('./src/**/*.html')
+  gulp.src(htmlSrc)
     .pipe(htmlmin({collapseWhitespace: true, removeComments: true}))
     .pipe(gulp.dest(destDir))
 })
