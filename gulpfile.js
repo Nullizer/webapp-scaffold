@@ -1,51 +1,65 @@
 const gulp         = require('gulp')
 const htmlmin      = require('gulp-htmlmin')
 const postcss      = require('gulp-postcss')
-const rollup       = require('gulp-rollup')
+const uglify       = require('gulp-uglify')
 const sourcemaps   = require('gulp-sourcemaps')
 const rename       = require('gulp-rename')
-const prettydiff   = require('gulp-prettydiff')
 const del          = require('del')
+const rollup       = require('rollup').rollup
 const cssnext      = require('postcss-cssnext')
 const autoprefixer = require('autoprefixer')
 const cssnano      = require('cssnano')
 const oldie        = require('oldie')
 const babel        = require('rollup-plugin-babel')
-const npm          = require('rollup-plugin-npm')
+const nodeResolve  = require('rollup-plugin-node-resolve')
+const rollupUglify = require('rollup-plugin-uglify')
 const commonjs     = require('rollup-plugin-commonjs')
+const path         = require('path')
 
-const destDir = './dest'
+const destDir = './www'
 
-gulp.task('default', ['html:minify', 'postcss', 'postcss:oldie', 'bundle'])
+gulp.task('default', ['html:minify', 'postcss', 'postcss:oldie', 'copy:dist', 'bundle', 'copy:dist'])
 
 gulp.task('clean', () => {
   del([destDir])
 })
 
-gulp.task('clean:bundle', () => {
-  del([destDir + '/**/*.js?(.map)'])
+gulp.task('clean:js', () => {
+  del([path.join(destDir, '/**/*.js?(.map)')])
 })
 
-gulp.task('bundle', ['clean:bundle'], () => {
-  gulp.src('src/**/*.js', {read: false})
-    .pipe(rollup({
-      format: 'umd',
-      plugins: [
-        npm({ jsnext: true, main: true }),
-        commonjs(),
-        babel({
-          exclude: 'node_modules/**',
-          plugins: ['transform-async-to-generator'],
-        }),
-      ],
-      sourceMap: true
-    }))
-    .pipe(prettydiff({
-      lang: 'javascript',
-      mode: 'minify',
-    }))
-    .pipe(sourcemaps.write('.'))
+gulp.task('copy:assets', () => {
+  gulp.src('./src/**/*.+(jpg|png|gif)')
     .pipe(gulp.dest(destDir))
+})
+
+gulp.task('copy:dist', () => {
+  gulp.src('./node_modules/babel-polyfill/dist/polyfill.min.js')
+    .pipe(gulp.dest(path.join(destDir, '/assets/js/polyfills')))
+  gulp.src('./node_modules/whatwg-fetch/fetch.js')
+    .pipe(uglify())
+    .pipe(gulp.dest(path.join(destDir, '/assets/js/polyfills')))
+})
+
+gulp.task('bundle', () => {
+  return rollup({
+    entry: 'src/assets/js/entry1.js',
+    plugins: [
+      nodeResolve({ jsnext: true, main: true }),
+      commonjs(),
+      babel({
+        exclude: 'node_modules/**',
+        presets: ['es2015-rollup'],
+        plugins: ['transform-async-to-generator'],
+      }),
+      rollupUglify(),
+    ]
+  }).then(bundle => {
+    return bundle.write({
+      format: 'umd',
+      dest: path.join(destDir, '/assets/js/main.js')
+    })
+  })
 })
 
 gulp.task('postcss', () => {
@@ -79,6 +93,6 @@ gulp.task('postcss:oldie', () => {
 
 gulp.task('html:minify', () => {
   gulp.src('./src/**/*.html')
-    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(htmlmin({collapseWhitespace: true, removeComments: true}))
     .pipe(gulp.dest(destDir))
 })
